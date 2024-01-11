@@ -1,0 +1,18 @@
+bitsandbytes
+transformers
+peft
+accelerate
+einops
+safetensors
+# torch for linux cuda 12.1:
+torch
+torchvision
+torchaudio
+# endtorch
+xformers
+langchain
+ctransformers[cuda]
+qdrant-client
+sentence-transformers
+huggingface-hub
+ipywidgets
