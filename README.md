@@ -23,4 +23,7 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
+## Further Reading
+
+* https://python.langchain.com/docs/use_cases/code_understanding
 
