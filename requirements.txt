@@ -16,3 +16,6 @@ qdrant-client
 sentence-transformers
 huggingface-hub
 ipywidgets
+langchain-openai
+langchain-community
+chromadb
