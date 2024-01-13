@@ -15,9 +15,7 @@ quantization_config = BitsAndBytesConfig(
 
 from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
 
-from qdrant_client import QdrantClient
 from langchain.llms import HuggingFacePipeline
-from langchain.document_loaders import TextLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.embeddings import HuggingFaceEmbeddings
 from langchain.chains import RetrievalQA
@@ -57,11 +55,13 @@ def main():
     # response = llm_chain.run({"question": question_p, "context": context_p})
     # print(response)
 
-    mna_news = """Vectora, a forward-thinking player in the tech startup ecosystem, has ushered in a new chapter by naming Priyanka Desai as its Chief Executive Officer. Desai, a renowned figure in the tech community for her groundbreaking work at Nexus Energy Solutions, takes the reins at Vectora to propel the company into a leader in sustainable technology. With an expansive vision and a stellar record, Desai emerged as the chosen leader after an extensive international search, reflecting the board's confidence in her innovative approach and strategic acumen.
-    This strategic appointment coincides with Vectora's most recent milestone--securing a transformative $200 million in funding aimed at accelerating its growth. Desai's illustrious career, highlighted by her success in scaling Nexus Energy Solutions to an industry vanguard, speaks to her exceptional leadership. "Priyanka is the embodiment of leadership with purpose, and her alignment with our core values is what makes this appointment a perfect match," expressed Anil Mehta, Vectora's co-founder. Desai's plans for Vectora not only encompass financial growth but also reinforce the company's pledge to environmental innovation.
-    Addressing the company after her appointment, Desai unveiled an ambitious roadmap to expand Vectora's R&D efforts and introduce groundbreaking products to reduce industrial carbon emissions. "I am energized to lead a company that is as committed to sustainability as it is to technological innovation," Desai shared, underscoring her commitment to combating the urgent challenges posed by climate change.
-    Desai's leadership style, characterized by her emphasis on inclusive growth and collaborative innovation, has been met with resounding approval from within Vectora's ranks and across the tech sector. Her drive for fostering a workplace where diverse ideas flourish has drawn particular admiration. "Priyanka brings a dynamic perspective to Vectora that will undoubtedly spark creativity and drive," commented Anjali Vaidya, a prominent technology sector analyst. "Her track record of empowering her teams speaks volumes about her potential impact on Vectora's trajectory."
-    As Desai takes charge, industry observers are keenly awaiting the rollout of Vectora's most ambitious endeavor yet--an AI-driven toolset designed to optimize energy management for a global clientele. With Desai at the wheel, Vectora stands on the precipice of not just market success, but also contributing a significant handprint to the global sustainability effort. The tech world is abuzz as Desai is set to officially step into her new role next week, marking a potentially transformative era for Vectora and the industry at large.
+    mna_news = """Before their ancient clash with humanity devastated their civilization, serpentfolk were masters of a sprawling underground empire. Few serpentfolk survive today; their power is shattered, their god Ydersius decapitated (although not quite slain). The cunning, intelligence, and magical abilities of serpentfolk have diminished from their ancient heights, and most are born without these boons. Those serpentfolk who retain their ancestry’s legacy of intelligence and magic are known as zyss, and they look down upon their more numerous kindred with a mix of disdain and shame. They see these offshoots as a curse on their kind, resulting from their god’s decapitation and the pandemonium during the fall of their underground empire, and have dubbed them aapoph, meaning “chaos made flesh.”
+
+Today, the central realm of the Darklands retains the old name of the serpentfolk empire that once dominated this region—Sekamina. This name is also the source of the serpentfolk’s Aklo title, sekmin, which they are often called in ancient texts. Sekamina itself retains very little of the serpentfolk’s legacy, its mantle of rule having passed on to others like drow, ghouls, gugs, and deep gnomes. Yet in remote reaches of this dangerous realm, the ruins of serpentfolk cities still stand. Within, a great many serpentfolk sleep in torpor in secluded vaults, with only a few cells awake to enact their schemes. In addition, a small number of serpentfolk settlements dot Golarion’s surface, most of them in humid, remote jungles, far-flung islands, or caverns close to the surface. It’s rare for such a settlement to number more than a few dozen serpentfolk. They rely primarily on slaves to build their power bases, to defend them, and to perform essentially all the practical functions of their society. This includes providing food, crafting goods, and tending to the serpentfolk’s every need.
+
+Zyss serpentfolk are megalomaniacal geniuses with dreams of returning to their place of dominance, though modern serpentfolk have few means of accomplishing this goal. Many of their plans hinge on resurrecting Ydersius, their decapitated god. His headless body still thrashes about, mindless, in the Darklands, waiting to be reunited with his lost skull. Serpentfolk numbers are so small that reclaiming their dominance seems a distant dream, especially since their reproduction is slow. Though a parent can birth a dozen young at once, the gestation period lasts up to a decade, and the likelihood that even one will be zyss is low. There’s no telling whether a child will be zyss or aapoph, regardless of parentage. A coveted zyss child is just as likely to arise from aapoph parents as from two zyss, and every serpentfolk colony has someone in charge of sorting the young, identifying the earliest signs of intelligence in them.
+
+Though the number of zyss is small in serpentfolk colonies, bringing in more zyss isn’t necessarily desirable. A serpentfolk conclave with just a few zyss is functional, but one with a large number becomes fractious. Cults and societies form, all pursuing their own passions and politics, with scheming and backstabbing running rampant. A powerful priest may be able to bring other zyss to heel, but many zyss question why a priest should be in charge if their god is dead. Zyss thrive on selfish desires for hedonistic pleasure and adulation. They feel no love for others, even their offspring. Thriving on decadence, they crave receiving expensive gifts, gorging themselves on massive meals, and pursing arts such as music, poetry, or sculpture. Even more academic hobbies, like the study of magic or warfare, take an artistic bent, like carefully designing colorful illusions or memorizing epic poems about renowned wars. Each zyss believes themself to have more refined tastes than their peers.
 
     """
 
@@ -91,7 +91,7 @@ def main():
         result = qa.run(query)
         print("\nResult: ", result)
 
-    query = """ What company is buyer and seller here """
+    query = """ What is the main theme (subject) here? """
     run_my_rag(qa, query)
 
 if __name__ == '__main__':

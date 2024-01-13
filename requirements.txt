@@ -11,6 +11,7 @@ torchaudio
 # endtorch
 xformers
 langchain
+langchain-community
 ctransformers[cuda]
 qdrant-client
 sentence-transformers
