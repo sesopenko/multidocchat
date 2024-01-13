@@ -22,6 +22,11 @@ from langchain.chains import RetrievalQA
 from langchain.vectorstores import Qdrant
 from langchain.schema.document import Document
 
+from langchain_community.document_loaders import DirectoryLoader
+from langchain_community.document_loaders import BSHTMLLoader
+from langchain.text_splitter import HTMLHeaderTextSplitter
+
+
 def main():
     model_id = "mistralai/Mistral-7B-Instruct-v0.1"
     model_4bit = AutoModelForCausalLM.from_pretrained( model_id, device_map="auto",quantization_config=quantization_config, )
@@ -32,7 +37,7 @@ def main():
         tokenizer=tokenizer,
         use_cache=True,
         device_map="auto",
-        max_length=500,
+        max_length=1024,
         do_sample=True,
         top_k=5,
         num_return_sequences=1,
@@ -41,19 +46,6 @@ def main():
     )
 
     llm = HuggingFacePipeline(pipeline=text_pipeline)
-
-    template = """<s>[INST] You are a helpful, respectful and honest assistant. Answer exactly in few words from the context
-    Answer the question below from context below :
-    {context}
-    {question} [/INST] </s>
-    """
-
-    # question_p = """Which companies announced their mergers"""
-    # context_p = """ In a landmark fusion of tech titans, Cybervine and QuantumNet announced their merger today, promising to redefine the digital frontier with their combined innovation powerhouse, now known as CyberQuantum."""
-    # prompt = PromptTemplate(template=template, input_variables=["question", "context"])
-    # llm_chain = LLMChain(prompt=prompt, llm=llm)
-    # response = llm_chain.run({"question": question_p, "context": context_p})
-    # print(response)
 
     mna_news = """Before their ancient clash with humanity devastated their civilization, serpentfolk were masters of a sprawling underground empire. Few serpentfolk survive today; their power is shattered, their god Ydersius decapitated (although not quite slain). The cunning, intelligence, and magical abilities of serpentfolk have diminished from their ancient heights, and most are born without these boons. Those serpentfolk who retain their ancestry’s legacy of intelligence and magic are known as zyss, and they look down upon their more numerous kindred with a mix of disdain and shame. They see these offshoots as a curse on their kind, resulting from their god’s decapitation and the pandemonium during the fall of their underground empire, and have dubbed them aapoph, meaning “chaos made flesh.”
 
@@ -65,9 +57,33 @@ Though the number of zyss is small in serpentfolk colonies, bringing in more zys
 
     """
 
-    documents = [Document(page_content=mna_news, metadata={"source":"local"})]
-    text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=20)
-    all_splits = text_splitter.split_documents(documents)
+    data_location = "/home/sean/src/github.com/sesopenko/foundrydbscraper/generated"
+
+    loader = DirectoryLoader(data_location,
+                             glob="**/*.html",
+                             show_progress=True,
+                             # use_multithreading=True,
+                             loader_cls=BSHTMLLoader,
+                             )
+    docs = loader.load()
+    headers_to_split_on = [
+        ("h1", "Header 1"),
+        ("h2", "Header 2"),
+        ("h3", "Header 3"),
+    ]
+    html_splitter = HTMLHeaderTextSplitter(headers_to_split_on=headers_to_split_on)
+    html_splits = []
+    for doc in docs:
+        doc_splits = html_splitter.split_text(doc.page_content)
+        html_splits += doc_splits
+    recursive_splitter = RecursiveCharacterTextSplitter(chunk_size=1024,chunk_overlap=30)
+    all_splits = recursive_splitter.split_documents(html_splits)
+    # text_splitter = RecursiveCharacterTextSplitter.from_tiktoken_encoder(chunk_size=500, chunk_overlap=0)
+    # all_splits = text_splitter.split_documents(docs)
+
+    # documents = [Document(page_content=mna_news, metadata={"source":"local"})]
+    # text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=20)
+    # all_splits = text_splitter.split_documents(documents)
     model_name = "sentence-transformers/all-mpnet-base-v2"
     model_kwargs = {"device": "cuda"}
     embeddings = HuggingFaceEmbeddings(model_name=model_name, model_kwargs=model_kwargs)
@@ -91,7 +107,7 @@ Though the number of zyss is small in serpentfolk colonies, bringing in more zys
         result = qa.run(query)
         print("\nResult: ", result)
 
-    query = """ What is the main theme (subject) here? """
+    query = """ What's in the Elite Viewing Room? """
     run_my_rag(qa, query)
 
 if __name__ == '__main__':

@@ -17,3 +17,7 @@ qdrant-client
 sentence-transformers
 huggingface-hub
 ipywidgets
+tqdm
+beautifulsoup4
+tiktoken
+lxml
