@@ -9,18 +9,20 @@ by Vardhanam Daga.
 
 My own environment has the following:
 
+* conda (or miniconda)
 * Nvidia 30 series or later gpu
 * Debian 12 Linux
 * Nvidia official drivers (.sh installation)
-* cuda toolkit installed 12.1
+* cuda toolkit installed 12.1 and 11.4
 * cuda 12 or later drivers installed
 
 ## Setup
 
 ```bash
-python -m venv venv
-source venv/bin/activate
+conda create multidoc
+conda activate multidoc
 pip install -r requirements.txt
+conda install -c pytorch -c nvidia faiss-gpu=1.7.4 mkl=2021 blas=1.0=mkl
 ```
 
 ## Further Reading

@@ -94,10 +94,11 @@ def pathquery():
 
     doc_splits = get_game_splits()
     embeddings = HuggingFaceEmbeddings(model_name='sentence-transformers/all-mpnet-base-v2')
-    db = Qdrant.from_documents(documents=doc_splits, embedding=embeddings, location=":memory:",
-         prefer_grpc=True,
-         collection_name="my_documents",
-     )  # Local mode with in-memory storage only
+    # db = Qdrant.from_documents(documents=doc_splits, embedding=embeddings, location=":memory:",
+    #      prefer_grpc=True,
+    #      collection_name="my_documents",
+    #  )  # Local mode with in-memory storage only
+    db = FAISS.from_documents(doc_splits, embeddings)
 
     retriever = db.as_retriever()
 

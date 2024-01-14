@@ -21,3 +21,4 @@ tqdm
 beautifulsoup4
 tiktoken
 lxml
+faiss-gpu
