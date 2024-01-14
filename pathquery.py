@@ -4,7 +4,7 @@ import transformers
 from langchain.llms import HuggingFacePipeline
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_core.prompts import PromptTemplate
-from langchain_core.runnables import RunnablePassthrough
+from langchain_core.runnables import RunnablePassthrough, RunnableLambda
 from transformers import (
   AutoTokenizer,
   AutoModelForCausalLM,
@@ -15,9 +15,15 @@ from langchain.text_splitter import HTMLHeaderTextSplitter, RecursiveCharacterTe
 from langchain_community.document_loaders import DirectoryLoader, BSHTMLLoader
 from langchain.vectorstores import FAISS
 from langchain.chains import LLMChain
-from langchain.vectorstores import Qdrant
+from langchain.memory import ConversationBufferMemory
+from operator import itemgetter
+
+from transformers import logging
+
+import textwrap
 
 def pathquery():
+    logging.set_verbosity_info()
 
     model_name = 'mistralai/Mistral-7B-Instruct-v0.1'
     model_config = transformers.AutoConfig.from_pretrained(model_name)
@@ -90,14 +96,11 @@ def pathquery():
         repetition_penalty=1.1,
         return_full_text=True,
         max_new_tokens=1000,
+        do_sample=True,
     )
 
     doc_splits = get_game_splits()
     embeddings = HuggingFaceEmbeddings(model_name='sentence-transformers/all-mpnet-base-v2')
-    # db = Qdrant.from_documents(documents=doc_splits, embedding=embeddings, location=":memory:",
-    #      prefer_grpc=True,
-    #      collection_name="my_documents",
-    #  )  # Local mode with in-memory storage only
     db = FAISS.from_documents(doc_splits, embeddings)
 
     retriever = db.as_retriever()
@@ -123,15 +126,26 @@ def pathquery():
     mistral_llm = HuggingFacePipeline(pipeline=text_generation_pipeline)
 
     llm_chain = LLMChain(llm=mistral_llm, prompt=prompt)
+    memory = ConversationBufferMemory(return_messages=True)
+    memory.load_memory_variables({})
+
+    passthrough = RunnablePassthrough()
+    passthrough.assign(
+        history=RunnableLambda(memory.load_memory_variables) | itemgetter('history')
+
+    )
 
     rag_chain = (
         {
             "context": retriever,
             "question": RunnablePassthrough(),
-        } | llm_chain
+        } | llm_chain | passthrough
     )
-    result = rag_chain.invoke("Who is the boss of the Library?")
-    print(result["text"])
+    while True:
+        question = input("Question: ")
+        result = rag_chain.invoke(question)
+        wrapped_text = textwrap.fill(result["text"], width=180)
+        print(wrapped_text)
 
 def get_game_splits():
     data_location = "/home/sean/src/github.com/sesopenko/foundrydbscraper/generated"
