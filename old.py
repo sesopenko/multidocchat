@@ -32,13 +32,12 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain.chains import LLMChain
 
 
+def runmyrag():
+    pass
+
 async def main():
     all_splits = get_game_splits()
     llm = get_llm()
-
-
-
-
 
     model_name = "sentence-transformers/all-mpnet-base-v2"
     model_kwargs = {"device": "cuda"}
@@ -146,4 +145,4 @@ def get_game_splits():
 
 
 if __name__ == '__main__':
-    asyncio.run(main())
+    runmyrag()
