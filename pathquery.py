@@ -22,6 +22,8 @@ from transformers import logging
 
 import textwrap
 
+import warnings
+
 def pathquery():
     logging.set_verbosity_info()
 
@@ -143,6 +145,7 @@ def pathquery():
             "question": RunnablePassthrough(),
         } | llm_chain | passthrough
     )
+    warnings.filterwarnings("ignore")
     while True:
         question = input("Question: ")
         result = rag_chain.invoke(question)
@@ -150,7 +153,7 @@ def pathquery():
         print(wrapped_text)
 
 def get_game_splits():
-    data_location = "/home/sean/src/github.com/sesopenko/foundrydbscraper/generated"
+    data_location = os.environ.get("DOC_LOC")
     loader = DirectoryLoader(data_location,
                              glob="**/*.html",
                              show_progress=True,
