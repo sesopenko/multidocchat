@@ -107,8 +107,10 @@ def pathquery():
 
     prompt_template = """
         ### [INST] 
-        Instruction: Answer the question based on your 
-        Pathfinder 2nd Edition game and world knowledge. Here is context to help:
+        Instruction: You are a helpful assistant for a Dungeon Master of the Pathfinder 2nd Edition role playing game.
+        Answer the question based on your Pathfinder 2nd Edition game and world knowledge.
+        Be creative, but if you don't know the answer, say you don't know.
+        Here is context to help:
 
         {context}
 
@@ -144,7 +146,7 @@ def pathquery():
     while True:
         question = input("Question: ")
         result = rag_chain.invoke(question)
-        wrapped_text = textwrap.fill(result["text"], width=180)
+        wrapped_text = textwrap.fill(result["text"], width=120)
         print(wrapped_text)
 
 def get_game_splits():
