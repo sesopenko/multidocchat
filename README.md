@@ -27,7 +27,7 @@ conda install -c pytorch -c nvidia faiss-gpu=1.7.4 mkl=2021 blas=1.0=mkl
 Set your `DOC_LOC` environment variable to the location of your game world html files. You can scrape them with
 [pfw_scraper](https://github.com/sesopenko/pfw_scraper).
 
-## Licensed GNU GPL V3
+## Licensed Apache V2
 
 [LICENSE.txt](LICENSE.txt) should be included when distributing this software.
 
